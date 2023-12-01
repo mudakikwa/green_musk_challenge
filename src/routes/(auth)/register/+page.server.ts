@@ -27,7 +27,7 @@ export const actions = {
 					out: {
 						status: 400,
 						message: 'Email Already Exist'
-					}
+					}	
 				};
 			}
 
