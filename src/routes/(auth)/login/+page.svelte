@@ -14,6 +14,8 @@
 	const { form, errors, enhance } = superForm(data.form, {
 		validators: newContactSchema
 	});
+
+	$: $page.form?.out?.token && localStorage.setItem('token', $page.form?.out.token);
 </script>
 
 <svelte:head>

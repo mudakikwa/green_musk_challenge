@@ -2,12 +2,10 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { newContactSchema } from './schema.js';
 import { client } from '../../../backend/client.js';
 import { UserExist, type UserExistTypes } from '../../../backend/query.js';
-import { verifyPassword } from '../shared.js';
+import { generateToken, verifyPassword } from '../shared.js';
 
 export const load = async (event) => {
 	const form = await superValidate(event, newContactSchema);
-	console.Console;
-	console.log('the vent', form);
 	return {
 		form
 	};
@@ -28,7 +26,8 @@ export const actions = {
 					form,
 					out: {
 						status: 200,
-						message: 'You can continue'
+						message: 'You can continue',
+						token: generateToken(res.users[0].id)
 					}
 				};
 			} catch (error) {
