@@ -3,6 +3,7 @@ import { createUser } from './schema.js';
 import { client } from '../../../backend/client.js';
 import { createUserBack, type createUserType } from '../../../backend/mutation.js';
 import { UserExist, type UserExistTypes } from '../../../backend/query.js';
+import { encryptPassword } from '../shared.js';
 
 export const load = async (event) => {
 	const form = await superValidate(event, createUser);
@@ -14,12 +15,6 @@ export const load = async (event) => {
 export const actions = {
 	default: async (event) => {
 		const form = await superValidate(event, createUser);
-		const variables: createUserType = {
-			email_address: form.data.email,
-			fullname: form.data.fullname,
-			password: form.data.password
-		};
-
 		const userExistVariables: UserExistTypes = {
 			email_address: form.data.email
 		};
@@ -35,6 +30,13 @@ export const actions = {
 					}
 				};
 			}
+
+			const encryptedPassword = await encryptPassword(form.data.password);
+			const variables: createUserType = {
+				email_address: form.data.email,
+				fullname: form.data.fullname,
+				password: encryptedPassword
+			};
 			const res = await client.request(createUserBack, variables);
 			if (res) {
 				return {

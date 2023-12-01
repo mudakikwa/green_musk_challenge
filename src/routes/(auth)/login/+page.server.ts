@@ -2,6 +2,7 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { newContactSchema } from './schema.js';
 import { client } from '../../../backend/client.js';
 import { UserExist, type UserExistTypes } from '../../../backend/query.js';
+import { verifyPassword } from '../shared.js';
 
 export const load = async (event) => {
 	const form = await superValidate(event, newContactSchema);
@@ -21,20 +22,21 @@ export const actions = {
 
 		try {
 			const res = await client.request<any>(UserExist, variables);
-			if (res.users.length === 0) {
+			try {
+				await verifyPassword(res.users[0].password, form.data.password);
 				return {
 					form,
 					out: {
 						status: 200,
-						message: 'You can Login'
+						message: 'You can continue'
 					}
 				};
-			} else {
+			} catch (error) {
 				return {
 					form,
 					out: {
-						status: 200,
-						message: 'User Already Exist'
+						status: 400,
+						message: 'Invalid password or username'
 					}
 				};
 			}
@@ -44,7 +46,7 @@ export const actions = {
 				form,
 				out: {
 					status: 400,
-					body: { error: 'error making backend request' }
+					message: 'error making backend request'
 				}
 			};
 		}

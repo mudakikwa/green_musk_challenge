@@ -4,6 +4,7 @@ export const UserExist = gql`
 	query UserExist($email_address: String) {
 		users(where: { email_address: { _eq: $email_address } }) {
 			id
+            password
 		}
 	}
 `;
