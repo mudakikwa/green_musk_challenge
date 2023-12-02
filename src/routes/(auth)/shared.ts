@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '$env/static/private';
+import { JWT_SECRET, THE_PLATFORM } from '$env/static/private';
 
 export async function encryptPassword(password: string) {
 	try {
@@ -43,4 +43,26 @@ export function generateToken(userId: string) {
 	};
 
 	return jwt.sign(payload, secretKey, options);
+}
+
+export async function canWeUseTheEmail(email: string) {
+	type commentType = {
+		postId: number;
+		id: number;
+		name: string;
+		email: string;
+		body: string;
+	};
+	try {
+		const response = await fetch(THE_PLATFORM);
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		const comments = await response.json();
+
+		return comments.some((comment: commentType) => comment.email === email);
+	} catch (error) {
+		console.error('There was an error fetching the comments:', error);
+		return false;
+	}
 }

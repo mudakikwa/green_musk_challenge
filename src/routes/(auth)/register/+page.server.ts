@@ -3,7 +3,7 @@ import { createUser } from './schema.js';
 import { client } from '../../../backend/client.js';
 import { createUserBack, type createUserType } from '../../../backend/mutation.js';
 import { UserExist, type UserExistTypes } from '../../../backend/query.js';
-import { encryptPassword } from '../shared.js';
+import { canWeUseTheEmail, encryptPassword } from '../shared.js';
 
 export const load = async (event) => {
 	const form = await superValidate(event, createUser);
@@ -15,6 +15,18 @@ export const load = async (event) => {
 export const actions = {
 	default: async (event) => {
 		const form = await superValidate(event, createUser);
+
+		// check if we can use the email
+		const canWe = await canWeUseTheEmail(form.data.email);
+		if (!canWe) {
+			return {
+				form,
+				out: {
+					status: 400,
+					message: "We can't use this email"
+				}
+			};
+		}
 		const userExistVariables: UserExistTypes = {
 			email_address: form.data.email
 		};
@@ -27,7 +39,7 @@ export const actions = {
 					out: {
 						status: 400,
 						message: 'Email Already Exist'
-					}	
+					}
 				};
 			}
 
