@@ -31,7 +31,7 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: Jya509RsTuhTj6cPIJ5UD2I0SgOiSWOU7jDwbhWgNdL24CUHIAjTXDJvkVi2HK1C
       HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256","key":"6283636c-ed55-4cdc-9da6-38bfece5f3f6","claims_format":"json"}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
-  external:
+  green_musk:
     container_name: green_musk_app
     image: green_musk_app
     build:
